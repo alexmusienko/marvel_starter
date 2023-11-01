@@ -4,7 +4,7 @@ import './charList.scss';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
-const CARD_PORTION = 3;
+const CARD_PORTION = 6;
 
 class CharList extends Component {
 
@@ -22,6 +22,11 @@ class CharList extends Component {
 
     componentDidMount() {
         this.updateChars();
+        window.addEventListener('scroll', this.onScroll);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('scroll', this.updateChars);
     }
 
     onCharsUpdated = (newChars) => {
@@ -51,9 +56,16 @@ class CharList extends Component {
         });
     }
 
-    updateChars = (offset) => {
+    onScroll = () => {
+        if (this.state.loading) return;
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+            this.updateChars();
+        }
+    }
+
+    updateChars = () => {
         this.onCharsLoading();
-        this.marvelService.getAllCharacters(CARD_PORTION, offset)
+        this.marvelService.getAllCharacters(CARD_PORTION, this.state.offset)
             .then(this.onCharsUpdated)
             .catch(this.onError);
     }
@@ -70,7 +82,7 @@ class CharList extends Component {
                 {content}
                 {spinner}
                 <button className="button button__main button__long"
-                    onClick={() => this.updateChars(offset)}
+                    onClick={this.updateChars}
                     disabled={loading}
                     style={{'display': charsEnded ? 'none' : 'block'}}>
                     <div className="inner">load more</div>
