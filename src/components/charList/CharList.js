@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 import MarvelService from '../../services/MarvelService';
 import './charList.scss';
 import Spinner from '../spinner/Spinner';
@@ -31,7 +32,6 @@ class CharList extends Component {
 
     onCharsUpdated = (newChars) => {
         const ended = newChars.length < CARD_PORTION;
-        console.log(ended);
         this.setState((state) =>
         ({
             chars: [...state.chars, ...newChars],
@@ -70,11 +70,18 @@ class CharList extends Component {
             .catch(this.onError);
     }
 
+    onCharClick = (id) => {
+        this.setState({
+            selectedId: id
+        })
+        this.props.onCharSelected(id);
+    }
+
     render = () => {
-        const { selectedId, chars, loading, error, offset, charsEnded } = this.state;
+        const { selectedId, chars, loading, error, charsEnded } = this.state;
         const spinner = loading ? <Spinner /> : null;
         const errorMessage = error ? <ErrorMessage /> : null;
-        const content = !error ? <ViewCharList chars={chars} selectedId={selectedId} onCharSelected={this.props.onCharSelected}/> : null;
+        const content = !error ? <ViewCharList chars={chars} selectedId={selectedId} onCharSelected={this.onCharClick} /> : null;
 
         return (
             <div className="char__list" >
@@ -97,7 +104,17 @@ const ViewCharList = ({ chars, selectedId, onCharSelected }) => {
         const classes = (char.id === selectedId) ? 'char__item char__item_selected' : 'char__item';
         const styleObjectFit = (char.thumbnail.indexOf('image_not_available.jpg') !== -1) ? 'contain' : 'cover';
         return (
-            <li className={classes} key={char.id} onClick={() => onCharSelected(char.id)}>
+            <li 
+                className={classes}
+                key={char.id}
+                onClick={() => onCharSelected(char.id)}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                        e.preventDefault();
+                        onCharSelected(char.id);
+                    }
+                }}>
                 <img src={char.thumbnail} alt="abyss" style={{ objectFit: styleObjectFit }} />
                 <div className="char__name">{char.name}</div>
             </li>
@@ -110,6 +127,10 @@ const ViewCharList = ({ chars, selectedId, onCharSelected }) => {
         </ul>
     );
 
+}
+
+CharList.propTypes = {
+    onCharSelected: PropTypes.func.isRequired
 }
 
 export default CharList;
