@@ -1,102 +1,95 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import MarvelService from '../../services/MarvelService';
 import './charList.scss';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
+import useMarvelService from '../../services/MarvelService';
 
 const CARD_PORTION = 6;
 
-class CharList extends Component {
+const CharList = (props) => {
 
+    const [selectedId, setSelectedId] = useState(null);
+    const [chars, setChars] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+    const [offset, setOffset] = useState(0);
+    const [charsEnded, setCharsEnded] = useState(false);
 
-    state = {
-        selectedId: null,
-        chars: [],
-        loading: true,
-        error: false,
-        offset: 0,
-        charsEnded: false
-    }
+    const marvelService = useMarvelService();
 
-    marvelService = new MarvelService();
+    useEffect(() => {
+        //updateChars();
+        window.addEventListener('scroll', onScroll);
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+        }
+        // eslint-disable-next-line
+    }, []);
 
-    componentDidMount() {
-        this.updateChars();
-        window.addEventListener('scroll', this.onScroll);
-    }
+    useEffect(() => {
+        if (loading) {
+            updateChars();
+        }
+        // eslint-disable-next-line
+    }, [loading]);
 
-    componentWillUnmount() {
-        window.removeEventListener('scroll', this.updateChars);
-    }
-
-    onCharsUpdated = (newChars) => {
+    const onCharsUpdated = (newChars) => {
         const ended = newChars.length < CARD_PORTION;
-        this.setState((state) =>
-        ({
-            chars: [...state.chars, ...newChars],
-            loading: false,
-            error: false,
-            offset: state.offset + CARD_PORTION,
-            charsEnded: ended
-        }));
+        setChars(chars => [...chars, ...newChars]);
+        setLoading(false);
+        setError(false);
+        setOffset(offset => offset + CARD_PORTION);
+        setCharsEnded(ended);
     }
 
-    onCharsLoading = () => {
-        this.setState({
-            loading: true,
-            error: false
-        })
+    const onCharsLoading = () => {
+        setLoading(true);
+        setError(false);
     }
 
-    onError = () => {
-        this.setState({
-            loading: false,
-            error: true
-        });
+    const onError = () => {
+        setLoading(false);
+        setError(true);
     }
 
-    onScroll = () => {
-        if (this.state.loading) return;
+    const onScroll = () => {
+        //if (loading) return;
         if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-            this.updateChars();
+            setLoading(true);
         }
     }
 
-    updateChars = () => {
-        this.onCharsLoading();
-        this.marvelService.getAllCharacters(CARD_PORTION, this.state.offset)
-            .then(this.onCharsUpdated)
-            .catch(this.onError);
+    const updateChars = () => {
+        onCharsLoading();
+        marvelService.getAllCharacters(CARD_PORTION, offset)
+            .then(onCharsUpdated)
+            .catch(onError)
+            .finally(() => setLoading(false));
     }
 
-    onCharClick = (id) => {
-        this.setState({
-            selectedId: id
-        })
-        this.props.onCharSelected(id);
+    const onCharClick = (id) => {
+        setSelectedId(id)
+        props.onCharSelected(id);
     }
 
-    render = () => {
-        const { selectedId, chars, loading, error, charsEnded } = this.state;
-        const spinner = loading ? <Spinner /> : null;
-        const errorMessage = error ? <ErrorMessage /> : null;
-        const content = !error ? <ViewCharList chars={chars} selectedId={selectedId} onCharSelected={this.onCharClick} /> : null;
+    const spinner = loading ? <Spinner /> : null;
+    const errorMessage = error ? <ErrorMessage /> : null;
+    const content = !error ? <ViewCharList chars={chars} selectedId={selectedId} onCharSelected={onCharClick} /> : null;
 
-        return (
-            <div className="char__list" >
-                {errorMessage}
-                {content}
-                {spinner}
-                <button className="button button__main button__long"
-                    onClick={this.updateChars}
-                    disabled={loading}
-                    style={{'display': charsEnded ? 'none' : 'block'}}>
-                    <div className="inner">load more</div>
-                </button>
-            </div>
-        )
-    }
+    return (
+        <div className="char__list" >
+            {errorMessage}
+            {content}
+            {spinner}
+            <button className="button button__main button__long"
+                onClick={() => setLoading(true)}
+                disabled={loading}
+                style={{ 'display': charsEnded ? 'none' : 'block' }}>
+                <div className="inner">load more</div>
+            </button>
+        </div>
+    )
 }
 
 const ViewCharList = ({ chars, selectedId, onCharSelected }) => {
@@ -104,7 +97,7 @@ const ViewCharList = ({ chars, selectedId, onCharSelected }) => {
         const classes = (char.id === selectedId) ? 'char__item char__item_selected' : 'char__item';
         const styleObjectFit = (char.thumbnail.indexOf('image_not_available.jpg') !== -1) ? 'contain' : 'cover';
         return (
-            <li 
+            <li
                 className={classes}
                 key={char.id}
                 onClick={() => onCharSelected(char.id)}

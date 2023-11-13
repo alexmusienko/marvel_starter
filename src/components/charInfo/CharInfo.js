@@ -1,78 +1,62 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import MarvelService from '../../services/MarvelService';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
 import Skeleton from '../skeleton/Skeleton';
 import './charInfo.scss';
 
-class CharInfo extends Component {
+const CharInfo = (props) => {
 
-    state = {
-        char: null,
-        comics: null,
-        loading: false,
-        error: false
+    const [char, setChar] = useState(null);
+    const [comics, setComics] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+
+    const marvelService = new MarvelService();
+
+    useEffect(() => {
+        onCharUpdate();
+        // eslint-disable-next-line
+    }, [props.charId]);
+
+    const onCharLoaded = (char, comics) => {
+        setChar(char);
+        setComics(comics);
+        setLoading(false);
+        setError(false);
     }
 
-    marvelService = new MarvelService();
-
-    componentDidMount() {
-        this.onCharUpdate();
+    const onCharLoading = () => {
+        setLoading(true);
+        setError(false);
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        if (this.props.charId !== prevProps.charId) {
-            this.onCharUpdate();
-        }
+    const onError = () => {
+        setError(true);
     }
 
-    onCharLoaded = (char, comics) => {
-        this.setState({
-            char: char,
-            comics: comics,
-            loading: false,
-            error: false
-        })
-    }
-
-    onCharLoading = () => {
-        this.setState({
-            loading: true,
-            error: false
-        });
-    }
-
-    onError = () => {
-        this.setState({
-            error: true
-        })
-    }
-
-    onCharUpdate = () => {
-        const { charId } = this.props;
+    const onCharUpdate = () => {
+        const { charId } = props;
         if (!charId) return;
-        this.onCharLoading();
-        Promise.all([this.marvelService.getCharacter(charId), this.marvelService.getComicsListByChar(charId)])
-            .then(([char, comics]) => this.onCharLoaded(char, comics))
-            .catch(this.onError);
+        onCharLoading();
+        Promise.all([marvelService.getCharacter(charId), marvelService.getComicsListByChar(charId)])
+            .then(([char, comics]) => onCharLoaded(char, comics))
+            .catch(onError);
     }
 
-    render = () => {
-        const { char, comics, loading, error } = this.state;
-        const errorMessage = error ? <ErrorMessage /> : null;
-        const spinner = loading ? <Spinner /> : null;
-        const skeleton = (char || error || loading) ? null : <Skeleton />;
-        const content = (!error && !loading && char) ? <ViewCharInfo char={char} comics={comics} /> : null;
+    const errorMessage = error ? <ErrorMessage /> : null;
+    const spinner = loading ? <Spinner /> : null;
+    const skeleton = (char || error || loading) ? null : <Skeleton />;
+    const content = (!error && !loading && char) ? <ViewCharInfo char={char} comics={comics} /> : null;
 
-        return (
-            <div className="char__info">
-                {errorMessage}
-                {spinner}
-                {skeleton}
-                {content}
-            </div>
-        )
-    }
+    return (
+        <div className="char__info">
+            {errorMessage}
+            {spinner}
+            {skeleton}
+            {content}
+        </div>
+    )
 }
 
 const ViewCharInfo = ({ char, comics }) => {
@@ -88,7 +72,7 @@ const ViewCharInfo = ({ char, comics }) => {
     return (
         <>
             <div className="char__basics">
-                <img src={char.thumbnail} alt="character's img" style={{objectFit: styleObjectFit}} />
+                <img src={char.thumbnail} alt="character's img" style={{ objectFit: styleObjectFit }} />
                 <div>
                     <div className="char__info-name">{char.name}</div>
                     <div className="char__btns">
