@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
 import Skeleton from '../skeleton/Skeleton';
+
 import './charInfo.scss';
 
 const CharInfo = (props) => {
 
     const [char, setChar] = useState(null);
     const [comics, setComics] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
 
-    const marvelService = new MarvelService();
+    const { loading, error, clearError, getCharacter, getComicsListByChar } = useMarvelService();
 
     useEffect(() => {
         onCharUpdate();
@@ -22,26 +21,16 @@ const CharInfo = (props) => {
     const onCharLoaded = (char, comics) => {
         setChar(char);
         setComics(comics);
-        setLoading(false);
-        setError(false);
-    }
-
-    const onCharLoading = () => {
-        setLoading(true);
-        setError(false);
-    }
-
-    const onError = () => {
-        setError(true);
     }
 
     const onCharUpdate = () => {
         const { charId } = props;
         if (!charId) return;
-        onCharLoading();
-        Promise.all([marvelService.getCharacter(charId), marvelService.getComicsListByChar(charId)])
-            .then(([char, comics]) => onCharLoaded(char, comics))
-            .catch(onError);
+        clearError();
+        Promise.all([getCharacter(charId), getComicsListByChar(charId)])
+            .then(([char, comics]) => {
+                onCharLoaded(char, comics)
+            });
     }
 
     const errorMessage = error ? <ErrorMessage /> : null;
@@ -61,11 +50,14 @@ const CharInfo = (props) => {
 
 const ViewCharInfo = ({ char, comics }) => {
 
-    const comicsList = comics.slice(0, 10).map((item, i) => (
-        <li className="char__comics-item" key={i}>
-            <a href={item.url}>{item.title}</a>
-        </li>
-    ));
+    let comicsList = [];
+    if (comics) {
+        comicsList = comics.slice(0, 10).map((item, i) => (
+            <li className="char__comics-item" key={i}>
+                <a href={item.url}>{item.title}</a>
+            </li>
+        ));
+    }
     const styleObjectFit = (char.thumbnail.indexOf('image_not_available.jpg') !== -1) ? 'contain' : 'cover';
     const noComicsMessage = comicsList.length ? null : 'There is no comics for this character';
 

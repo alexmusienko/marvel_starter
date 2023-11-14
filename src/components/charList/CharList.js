@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import './charList.scss';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import useMarvelService from '../../services/MarvelService';
+
+import './charList.scss';
 
 const CARD_PORTION = 6;
 
@@ -11,61 +12,44 @@ const CharList = (props) => {
 
     const [selectedId, setSelectedId] = useState(null);
     const [chars, setChars] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
     const [offset, setOffset] = useState(0);
     const [charsEnded, setCharsEnded] = useState(false);
+    const [needMore, setNeedMore] = useState(true);
 
-    const marvelService = useMarvelService();
+    const {loading, error, clearError, getAllCharacters} = useMarvelService();
 
     useEffect(() => {
-        //updateChars();
         window.addEventListener('scroll', onScroll);
         return () => {
             window.removeEventListener('scroll', onScroll);
         }
-        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
-        if (loading) {
+        if (needMore) {
             updateChars();
         }
         // eslint-disable-next-line
-    }, [loading]);
+    }, [needMore]);
 
     const onCharsUpdated = (newChars) => {
         const ended = newChars.length < CARD_PORTION;
         setChars(chars => [...chars, ...newChars]);
-        setLoading(false);
-        setError(false);
         setOffset(offset => offset + CARD_PORTION);
         setCharsEnded(ended);
     }
 
-    const onCharsLoading = () => {
-        setLoading(true);
-        setError(false);
-    }
-
-    const onError = () => {
-        setLoading(false);
-        setError(true);
-    }
-
     const onScroll = () => {
-        //if (loading) return;
         if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-            setLoading(true);
+            setNeedMore(true);
         }
     }
 
     const updateChars = () => {
-        onCharsLoading();
-        marvelService.getAllCharacters(CARD_PORTION, offset)
+        clearError();
+        getAllCharacters(CARD_PORTION, offset)
             .then(onCharsUpdated)
-            .catch(onError)
-            .finally(() => setLoading(false));
+            .finally(() => setNeedMore(false));
     }
 
     const onCharClick = (id) => {
@@ -83,7 +67,7 @@ const CharList = (props) => {
             {content}
             {spinner}
             <button className="button button__main button__long"
-                onClick={() => setLoading(true)}
+                onClick={() => setNeedMore(true)}
                 disabled={loading}
                 style={{ 'display': charsEnded ? 'none' : 'block' }}>
                 <div className="inner">load more</div>
