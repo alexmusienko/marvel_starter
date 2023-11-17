@@ -37,23 +37,23 @@ const App = () => {
                 <img className="bg-decoration" src={decoration} alt="vision" />
             </main> */}
 
-            {/* <main>
+            <main>
                 <ErrorBoundary>
                     <AppBanner />
                 </ErrorBoundary>
                 <ErrorBoundary>
                     <ComicsList />
                 </ErrorBoundary>
-            </main> */}
+            </main>
 
-            <main>
+            {/* <main>
                 <ErrorBoundary>
                     <AppBanner />
                 </ErrorBoundary>
                 <ErrorBoundary>
                     <SingleComic id={57} />
                 </ErrorBoundary>
-            </main>
+            </main> */}
 
         </div>
     )

@@ -41,6 +41,8 @@ const ComicsList = () => {
     const errorMessage = error ? <ErrorMessage /> : null;
     const content = error ? null : <ViewComicsList comics={comics} />
 
+    console.log('render');
+
     return (
         <div className="comics__list">
             {errorMessage}
