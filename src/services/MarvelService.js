@@ -37,6 +37,7 @@ const useMarvelService = () => {
         const res = await request(`${_apiBase}characters/${id}/comics?${_apiKey}`);
         return res.data.results.map(item => {
             return {
+                id: item.id,
                 title: item.title,
                 url: item.urls.filter(item => item.type === 'detail')[0].url
             }

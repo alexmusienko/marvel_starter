@@ -1,18 +1,21 @@
+import { useParams } from "react-router-dom";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 import AppBanner from "../appBanner/AppBanner";
 import SingleComic from "../singleComic/SingleComic";
 
-const ComicPage = () => {
+const SingleComicPage = () => {
+    const {comicId} = useParams();
+
     return (
         <>
             <ErrorBoundary>
                 <AppBanner />
             </ErrorBoundary>
             <ErrorBoundary>
-                <SingleComic id={57} />
+                <SingleComic id={comicId} />
             </ErrorBoundary>
         </>
     );
 }
 
-export default ComicPage;
+export default SingleComicPage;

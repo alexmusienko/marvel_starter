@@ -4,6 +4,7 @@ import useMarvelService from '../../services/MarvelService';
 import './singleComic.scss';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
+import { Link } from 'react-router-dom';
 
 const SingleComic = (props) => {
 
@@ -23,6 +24,13 @@ const SingleComic = (props) => {
     }
 
     const viewContent = (comic) => {
+        const homepageBtn = comic.homepage ?
+            (
+                <a href={comic.homepage} className="button button__main">
+                    <div className="inner">homepage</div>
+                </a>
+            ) : null;
+
         return (
             <div className="single-comic">
                 <img src={comic.thumbnail} alt={comic.title} className="single-comic__img" />
@@ -32,8 +40,9 @@ const SingleComic = (props) => {
                     <p className="single-comic__descr">{comic.pages}</p>
                     <p className="single-comic__descr">Language: {comic.language}</p>
                     <div className="single-comic__price">{comic.price.toFixed(2) + '$'}</div>
+                    {homepageBtn}
                 </div>
-                <a href="#" className="single-comic__back">Back to all</a>
+                <Link to="/comics" className="single-comic__back">Back to all</Link>
             </div>
         );
     }

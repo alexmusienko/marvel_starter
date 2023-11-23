@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import useMarvelService from '../../services/MarvelService';
@@ -9,9 +11,13 @@ const COMICS_CARD_PORTION = 8;
 
 const ComicsList = () => {
 
-    const [comics, setComics] = useState([]);
-    const [offset, setOffset] = useState(0);
-    const [needMore, setNeedMore] = useState(true);
+    const offsetSS = +sessionStorage.getItem('offset');
+    const jsonComicsSS = sessionStorage.getItem('comics');
+    const comicsSS = jsonComicsSS ? JSON.parse(jsonComicsSS) : [];
+
+    const [comics, setComics] = useState(comicsSS);
+    const [offset, setOffset] = useState(offsetSS ?? 0);
+    const [needMore, setNeedMore] = useState(comicsSS.length === 0);
     const [hasMoreToLoad, setHasMoreToLoad] = useState(true);
 
     const { loading, error, clearError, getAllComics } = useMarvelService();
@@ -23,10 +29,35 @@ const ComicsList = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [needMore]);
 
+    useEffect(() => {
+        restoreScrollPosition();
+    }, []);
+
+    const restoreScrollPosition = () => {
+        console.log('current', window.scrollY);
+        const pos = +sessionStorage.getItem('scrollPosition');
+        if (pos) {
+            console.log('read pos', pos);
+            //window.scrollTo({ top: pos - window.scrollY, behavior: 'smooth' });
+            window.scrollTo(0, pos);
+            setTimeout(() => console.log('restore', window.scrollY), 2000);
+        }
+    }
+
     const onComicsUpdated = (newComics) => {
         const receiveFullPortion = (newComics.length === COMICS_CARD_PORTION);
-        setOffset(offset => offset + COMICS_CARD_PORTION);
-        setComics(comics => [...comics, ...newComics]);
+        setOffset(offset => {
+            const resultOffset = offset + COMICS_CARD_PORTION;
+            sessionStorage.setItem('offset', resultOffset);
+            return resultOffset;
+        });
+        setComics(comics => {
+            const resultComics = [...comics, ...newComics];
+            sessionStorage.setItem('comics', JSON.stringify(resultComics));
+            console.log('save comics', resultComics.length);
+            return resultComics;
+        });
+
         setHasMoreToLoad(receiveFullPortion);
     }
 
@@ -57,13 +88,19 @@ const ComicsList = () => {
 }
 
 const ViewComicsList = ({ comics }) => {
+
+    const saveScrollPosition = () => {
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+        console.log('save', window.scrollY);
+    }
+
     const items = comics && comics.map((comic, i) => (
-        <li className="comics__item" key={comic.id*1000000 + i}>
-            <a href={comic.homepage}>
+        <li className="comics__item" key={comic.id * 1000000 + i}>
+            <Link to={`/comics/${comic.id}`} onClick={saveScrollPosition}>
                 <img src={comic.thumbnail} alt={comic.title} className="comics__item-img" />
                 <div className="comics__item-name">{comic.title}</div>
                 <div className="comics__item-price">{comic.price.toFixed(2) + '$'}</div>
-            </a>
+            </Link>
         </li>
     ));
 
