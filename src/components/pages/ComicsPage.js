@@ -4,14 +4,14 @@ import ComicsList from "../comicsList/ComicsList";
 
 const ComicsPage = () => {
     return (
-        <>
+        <div>
             <ErrorBoundary>
                 <AppBanner />
             </ErrorBoundary>
             <ErrorBoundary>
                 <ComicsList />
             </ErrorBoundary>
-        </>
+        </div>
     );
 }
 

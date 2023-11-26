@@ -34,13 +34,10 @@ const ComicsList = () => {
     }, []);
 
     const restoreScrollPosition = () => {
-        console.log('current', window.scrollY);
         const pos = +sessionStorage.getItem('scrollPosition');
         if (pos) {
-            console.log('read pos', pos);
             //window.scrollTo({ top: pos - window.scrollY, behavior: 'smooth' });
             window.scrollTo(0, pos);
-            setTimeout(() => console.log('restore', window.scrollY), 2000);
         }
     }
 
@@ -54,7 +51,6 @@ const ComicsList = () => {
         setComics(comics => {
             const resultComics = [...comics, ...newComics];
             sessionStorage.setItem('comics', JSON.stringify(resultComics));
-            console.log('save comics', resultComics.length);
             return resultComics;
         });
 
@@ -91,7 +87,6 @@ const ViewComicsList = ({ comics }) => {
 
     const saveScrollPosition = () => {
         sessionStorage.setItem('scrollPosition', window.scrollY);
-        console.log('save', window.scrollY);
     }
 
     const items = comics && comics.map((comic, i) => (

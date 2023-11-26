@@ -7,14 +7,14 @@ const SingleComicPage = () => {
     const {comicId} = useParams();
 
     return (
-        <>
+        <div>
             <ErrorBoundary>
                 <AppBanner />
             </ErrorBoundary>
             <ErrorBoundary>
                 <SingleComic id={comicId} />
             </ErrorBoundary>
-        </>
+        </div>
     );
 }
 

@@ -5,6 +5,7 @@ import ErrorMessage from '../errorMessage/ErrorMessage';
 import useMarvelService from '../../services/MarvelService';
 
 import './charList.scss';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 const CARD_PORTION = 6;
 
@@ -16,7 +17,7 @@ const CharList = (props) => {
     const [charsEnded, setCharsEnded] = useState(false);
     const [needMore, setNeedMore] = useState(true);
 
-    const {loading, error, clearError, getAllCharacters} = useMarvelService();
+    const { loading, error, clearError, getAllCharacters } = useMarvelService();
 
     useEffect(() => {
         window.addEventListener('scroll', onScroll);
@@ -81,26 +82,32 @@ const ViewCharList = ({ chars, selectedId, onCharSelected }) => {
         const classes = (char.id === selectedId) ? 'char__item char__item_selected' : 'char__item';
         const styleObjectFit = (char.thumbnail.indexOf('image_not_available.jpg') !== -1) ? 'contain' : 'cover';
         return (
-            <li
-                className={classes}
+            <CSSTransition
                 key={char.id}
-                onClick={() => onCharSelected(char.id)}
-                tabIndex={0}
-                onKeyDown={(e) => {
-                    if (e.key === ' ' || e.key === 'Enter') {
-                        e.preventDefault();
-                        onCharSelected(char.id);
-                    }
-                }}>
-                <img src={char.thumbnail} alt="abyss" style={{ objectFit: styleObjectFit }} />
-                <div className="char__name">{char.name}</div>
-            </li>
+                classNames='char__item'
+                timeout={2000}>
+                <li
+                    className={classes}
+                    onClick={() => onCharSelected(char.id)}
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === ' ' || e.key === 'Enter') {
+                            e.preventDefault();
+                            onCharSelected(char.id);
+                        }
+                    }}>
+                    <img src={char.thumbnail} alt="abyss" style={{ objectFit: styleObjectFit }} />
+                    <div className="char__name">{char.name}</div>
+                </li>
+            </CSSTransition>
         )
     });
 
     return (
         <ul className="char__grid">
-            {cards}
+            <TransitionGroup component={null}>
+                {cards}
+            </TransitionGroup>
         </ul>
     );
 
