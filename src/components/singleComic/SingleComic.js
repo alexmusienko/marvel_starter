@@ -5,6 +5,7 @@ import './singleComic.scss';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 const SingleComic = (props) => {
 
@@ -32,18 +33,27 @@ const SingleComic = (props) => {
             ) : null;
 
         return (
-            <div className="single-comic">
-                <img src={comic.thumbnail} alt={comic.title} className="single-comic__img" />
-                <div className="single-comic__info">
-                    <h2 className="single-comic__name">{comic.title}</h2>
-                    <p className="single-comic__descr">{comic.description}</p>
-                    <p className="single-comic__descr">{comic.pages}</p>
-                    <p className="single-comic__descr">Language: {comic.language}</p>
-                    <div className="single-comic__price">{comic.price.toFixed(2) + '$'}</div>
-                    {homepageBtn}
+            <>
+                <Helmet>
+                    <meta
+                        name="description"
+                        content="Comic info"
+                    />
+                    <title>Marvel information portal - {comic.title}</title>
+                </Helmet>
+                <div className="single-comic">
+                    <img src={comic.thumbnail} alt={comic.title} className="single-comic__img" />
+                    <div className="single-comic__info">
+                        <h2 className="single-comic__name">{comic.title}</h2>
+                        <p className="single-comic__descr">{comic.description}</p>
+                        <p className="single-comic__descr">{comic.pages}</p>
+                        <p className="single-comic__descr">Language: {comic.language}</p>
+                        <div className="single-comic__price">{comic.price.toFixed(2) + '$'}</div>
+                        {homepageBtn}
+                    </div>
+                    <Link to="/comics" className="single-comic__back">Back to all</Link>
                 </div>
-                <Link to="/comics" className="single-comic__back">Back to all</Link>
-            </div>
+            </>
         );
     }
 

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+
 import PropTypes from 'prop-types';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -78,36 +80,47 @@ const CharList = (props) => {
 }
 
 const ViewCharList = ({ chars, selectedId, onCharSelected }) => {
-    const cards = chars.map(char => {
+    const cards = chars.map((char, i) => {
         const classes = (char.id === selectedId) ? 'char__item char__item_selected' : 'char__item';
         const styleObjectFit = (char.thumbnail.indexOf('image_not_available.jpg') !== -1) ? 'contain' : 'cover';
         return (
-            <CSSTransition
+            // <CSSTransition
+            //     key={char.id}
+            //     classNames='char__item'
+            //     timeout={2000}>
+            <motion.li
+                initial={{ opacity: 0, filter: 'grayscale(1)' }}
+                animate={{ opacity: 1, filter: 'grayscale(0)' }}
+                transition={{ delay: (i%CARD_PORTION) * 0.2 }}
                 key={char.id}
-                classNames='char__item'
-                timeout={2000}>
-                <li
-                    className={classes}
-                    onClick={() => onCharSelected(char.id)}
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                        if (e.key === ' ' || e.key === 'Enter') {
-                            e.preventDefault();
-                            onCharSelected(char.id);
-                        }
-                    }}>
-                    <img src={char.thumbnail} alt="abyss" style={{ objectFit: styleObjectFit }} />
-                    <div className="char__name">{char.name}</div>
-                </li>
-            </CSSTransition>
+                className={classes}
+                onClick={() => onCharSelected(char.id)}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                        e.preventDefault();
+                        onCharSelected(char.id);
+                    }
+                }}>
+                <motion.img
+                    src={char.thumbnail}
+                    alt="abyss"
+                    style={{ objectFit: styleObjectFit }}
+                    initial={{ opacity: 0, filter: 'grayscale(1)' }}
+                    animate={{ opacity: 1, filter: 'grayscale(0)' }}
+                    transition={{ delay: 0.2 }}
+                />
+                <div className="char__name">{char.name}</div>
+            </motion.li>
+            // </CSSTransition>
         )
     });
 
     return (
         <ul className="char__grid">
-            <TransitionGroup component={null}>
-                {cards}
-            </TransitionGroup>
+            {/* <TransitionGroup component={null}> */}
+            {cards}
+            {/* </TransitionGroup> */}
         </ul>
     );
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -90,13 +91,24 @@ const ViewComicsList = ({ comics }) => {
     }
 
     const items = comics && comics.map((comic, i) => (
-        <li className="comics__item" key={comic.id * 1000000 + i}>
+        <motion.li
+            className="comics__item"
+            key={comic.id * 1000000 + i}
+            initial={{ opacity: 0, filter: 'grayscale(1)' }}
+            animate={{ opacity: 1, filter: 'grayscale(0)' }}
+            transition={{ delay: (i % COMICS_CARD_PORTION) * 0.2 }}>
             <Link to={`/comics/${comic.id}`} onClick={saveScrollPosition}>
-                <img src={comic.thumbnail} alt={comic.title} className="comics__item-img" />
+                <img
+                    src={comic.thumbnail}
+                    alt={comic.title}
+                    className="comics__item-img"
+                    initial={{ opacity: 0, filter: 'grayscale(1)' }}
+                    animate={{ opacity: 1, filter: 'grayscale(0)' }}
+                    transition={{ delay: 0.2 }}/>
                 <div className="comics__item-name">{comic.title}</div>
                 <div className="comics__item-price">{comic.price.toFixed(2) + '$'}</div>
             </Link>
-        </li>
+        </motion.li>
     ));
 
     return (
