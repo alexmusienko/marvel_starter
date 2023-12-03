@@ -1,0 +1,53 @@
+@import '../../style/variables.scss';
+
+.search {
+    margin-top: 25px;
+    padding: 25px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25);
+    z-index: 5;
+    background-color: #fff;
+
+    &__title {
+        font-weight: bold;
+        font-size: 18px;
+        line-height: 24px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+
+    &__form {
+        display: grid;
+        grid-template-columns: 250px auto;
+        column-gap: 25px;
+    }
+
+    &__field {
+        padding: 0px 10px;        
+        height: 38px;
+        border: none;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    &__message {
+        font-family: Roboto Condensed;
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+    }
+
+    &__error {
+        margin-top: 15px;
+        color: $main-color;
+    }
+
+    &__good {
+        margin-top: 15px;
+        color: $green;
+        display: grid;
+        grid-template-columns: 250px auto;
+        column-gap: 25px;
+        align-items: center;
+    }
+
+}

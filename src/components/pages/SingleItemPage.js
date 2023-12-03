@@ -4,11 +4,12 @@ import { motion } from "framer-motion";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 import AppBanner from "../appBanner/AppBanner";
 import SingleComic from "../singleComic/SingleComic";
+import SingleChar from "../singleChar/SingleChar";
 import motionParams from "../../services/motionParams";
 import { Helmet } from "react-helmet";
 
-const SingleComicPage = () => {
-    const { comicId } = useParams();
+const SingleItemPage = ({mode}) => {
+    const { id } = useParams();
 
     return (
         <>
@@ -24,11 +25,11 @@ const SingleComicPage = () => {
                     <AppBanner />
                 </ErrorBoundary>
                 <ErrorBoundary>
-                    <SingleComic id={comicId} />
+                    {mode === 'comic' ? <SingleComic id={id} /> : <SingleChar id={id} />}
                 </ErrorBoundary>
             </motion.div>
         </>
     );
 }
 
-export default SingleComicPage;
+export default SingleItemPage;

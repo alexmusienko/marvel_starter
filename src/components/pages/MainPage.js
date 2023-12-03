@@ -8,6 +8,8 @@ import CharInfo from "../charInfo/CharInfo";
 import decoration from '../../resources/img/vision.png';
 import motionParams from "../../services/motionParams";
 import { Helmet } from "react-helmet";
+import Search from "../search/Search";
+import LiveSearch from "../liveSearch/LiveSearch";
 
 const MainPage = () => {
 
@@ -30,13 +32,21 @@ const MainPage = () => {
                 <ErrorBoundary>
                     <RandomChar />
                 </ErrorBoundary>
+                <ErrorBoundary>
+                    <LiveSearch />
+                </ErrorBoundary>
                 <div className="char__content">
                     <ErrorBoundary>
                         <CharList onCharSelected={onCharSelected} />
                     </ErrorBoundary>
-                    <ErrorBoundary>
-                        <CharInfo charId={selectedChar} />
-                    </ErrorBoundary>
+                    <div className="sidebar">
+                        <ErrorBoundary>
+                            <CharInfo charId={selectedChar} />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                            <Search />
+                        </ErrorBoundary>
+                    </div>
                 </div>
                 <img className="bg-decoration" src={decoration} alt="vision" />
             </motion.div>
